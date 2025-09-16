@@ -23,8 +23,7 @@ public class ClienteDAO implements IClienteDAO {
     @Override
     public boolean insertar(Cliente cliente) {
         String sql = "INSERT INTO Cliente (nombre, direccion, telefonos) VALUES (?, ?, ?)";
-        try (Connection conn = ConexionDB.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = ConexionDB.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, cliente.getNombre());
             ps.setString(2, cliente.getDireccion());
@@ -43,8 +42,7 @@ public class ClienteDAO implements IClienteDAO {
         String sql = "SELECT * FROM Cliente WHERE idCliente = ?";
         Cliente cliente = null;
 
-        try (Connection conn = ConexionDB.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = ConexionDB.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, idCliente);
             ResultSet rs = ps.executeQuery();
@@ -68,9 +66,7 @@ public class ClienteDAO implements IClienteDAO {
         String sql = "SELECT * FROM Cliente";
         List<Cliente> lista = new ArrayList<>();
 
-        try (Connection conn = ConexionDB.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+        try (Connection conn = ConexionDB.getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 Cliente cliente = new Cliente();
@@ -88,10 +84,35 @@ public class ClienteDAO implements IClienteDAO {
     }
 
     @Override
+    public List<Cliente> obtenerTodosPorFiltro(String filtro) {
+        String sql = "SELECT * FROM Cliente WHERE nombre LIKE ?";
+        List<Cliente> lista = new ArrayList<>();
+
+        try (Connection conn = ConexionDB.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, "%" + filtro + "%");
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Cliente cliente = new Cliente();
+                cliente.setIdCliente(rs.getInt("idCliente"));
+                cliente.setNombre(rs.getString("nombre"));
+                cliente.setDireccion(rs.getString("direccion"));
+                cliente.setTelefonos(rs.getString("telefonos"));
+                lista.add(cliente);
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Error al obtener clientes por filtro: " + e.getMessage());
+        }
+
+        return lista;
+    }
+
+    @Override
     public boolean actualizar(Cliente cliente) {
         String sql = "UPDATE Cliente SET nombre = ?, direccion = ?, telefonos = ? WHERE idCliente = ?";
-        try (Connection conn = ConexionDB.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = ConexionDB.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, cliente.getNombre());
             ps.setString(2, cliente.getDireccion());
@@ -109,8 +130,7 @@ public class ClienteDAO implements IClienteDAO {
     @Override
     public boolean eliminar(int idCliente) {
         String sql = "DELETE FROM Cliente WHERE idCliente = ?";
-        try (Connection conn = ConexionDB.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = ConexionDB.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, idCliente);
             return ps.executeUpdate() > 0;
@@ -120,4 +140,5 @@ public class ClienteDAO implements IClienteDAO {
             return false;
         }
     }
+
 }

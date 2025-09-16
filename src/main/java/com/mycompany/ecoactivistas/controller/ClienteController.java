@@ -8,6 +8,7 @@ import com.mycompany.ecoactivistas.dao.ClienteDAO;
 import com.mycompany.ecoactivistas.interfaces.IClienteDAO;
 import com.mycompany.ecoactivistas.model.Cliente;
 import java.util.List;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -82,6 +83,27 @@ public class ClienteController {
             return false;
         }
         return clienteDAO.eliminar(idCliente);
+    }
+    
+   
+    public DefaultTableModel obtenerTablaClientes() {
+        String[] columnas = {"ID", "NOMBRE", "DIRECCIÓN", "TELEFÓNO"};
+        DefaultTableModel modelo = new DefaultTableModel(null, columnas);
+        List<Cliente> lista = clienteDAO.obtenerTodos();
+        for (Cliente c : lista) {
+            modelo.addRow(new Object[]{c.getIdCliente(), c.getNombre(), c.getDireccion(), c.getTelefonos()});
+        }
+        return modelo;
+    }
+    
+    public DefaultTableModel obtenerTablaClientesPorFiltro(String filtro) {
+        String[] columnas = {"ID", "NOMBRE", "DIRECCIÓN", "TELEFÓNO"};
+        DefaultTableModel modelo = new DefaultTableModel(null, columnas);
+        List<Cliente> lista = clienteDAO.obtenerTodosPorFiltro(filtro);
+        for (Cliente c : lista) {
+            modelo.addRow(new Object[]{c.getIdCliente(), c.getNombre(), c.getDireccion(), c.getTelefonos()});
+        }
+        return modelo;
     }
     
 }
