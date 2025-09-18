@@ -106,4 +106,14 @@ public class ClienteController {
         return modelo;
     }
     
+    public DefaultTableModel obtenerTablaClientesPorFiltroModal(String filtro) {
+        String[] columnas = {"ID", "NOMBRE", "TELEFÓNO"};
+        DefaultTableModel modelo = new DefaultTableModel(null, columnas);
+        List<Cliente> lista = clienteDAO.obtenerTodosPorFiltroModal(filtro);
+        for (Cliente c : lista) {
+            modelo.addRow(new Object[]{c.getIdCliente(), c.getNombre(), c.getTelefonos()});
+        }
+        return modelo;
+    }
+    
 }

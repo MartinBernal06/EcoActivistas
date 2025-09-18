@@ -57,7 +57,6 @@ public class FrmClientes extends javax.swing.JPanel {
         lblID.setText("ID");
 
         txtID.setEditable(false);
-        txtID.setText("0");
         txtID.setEnabled(false);
 
         lblNombre.setText("NOMBRE");

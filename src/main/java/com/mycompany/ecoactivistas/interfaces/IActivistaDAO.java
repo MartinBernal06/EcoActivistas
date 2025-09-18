@@ -15,6 +15,8 @@ public interface IActivistaDAO {
     boolean insertar(Activista activista);
     Activista obtenerPorId(int idActivista);
     List<Activista> obtenerTodos();
+    List<Activista> obtenerTodosPorFiltro(String filtro);
+    List<Activista> obtenerTodosPorFiltroModal(String filtro);
     boolean actualizar(Activista activista);
     boolean eliminar(int idActivista);
 }

@@ -59,11 +59,7 @@ public class EcoActivistas {
         ProblemaController problemaCtrl = new ProblemaController();
         System.out.println("\n=== Pruebas Problema ===");
 
-        if (!clientes.isEmpty()) {
-            Cliente cliente = clientes.get(0);
-            boolean problemaAgregado = problemaCtrl.agregarProblema(Date.valueOf("2025-09-07"), null, "pendiente", cliente.getIdCliente());
-            System.out.println("Problema agregado: " + problemaAgregado);
-        }
+      
 
         List<Problema> problemas = problemaCtrl.listarProblemas();
         problemas.forEach(System.out::println);

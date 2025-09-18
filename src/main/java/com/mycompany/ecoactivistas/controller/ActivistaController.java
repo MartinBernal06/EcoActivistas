@@ -9,6 +9,7 @@ import com.mycompany.ecoactivistas.interfaces.IActivistaDAO;
 import com.mycompany.ecoactivistas.model.Activista;
 import java.sql.Date;
 import java.util.List;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -93,5 +94,34 @@ public class ActivistaController {
         }
         return activistaDAO.eliminar(idActivista);
     }
-}
 
+    public DefaultTableModel obtenerTablaActivistas() {
+        String[] columnas = {"ID", "NOMBRE", "TELEFÓNO", "INGRESO"};
+        DefaultTableModel modelo = new DefaultTableModel(null, columnas);
+        List<Activista> lista = activistaDAO.obtenerTodos();
+        for (Activista a : lista) {
+            modelo.addRow(new Object[]{a.getIdActivista(), a.getNombre(), a.getTelefono(), a.getFchIngreso()});
+        }
+        return modelo;
+    }
+
+    public DefaultTableModel obtenerTablaActivistasPorFiltro(String filtro) {
+        String[] columnas = {"ID", "NOMBRE", "TELEFÓNO", "INGRESO"};
+        DefaultTableModel modelo = new DefaultTableModel(null, columnas);
+        List<Activista> lista = activistaDAO.obtenerTodosPorFiltro(filtro);
+        for (Activista a : lista) {
+            modelo.addRow(new Object[]{a.getIdActivista(), a.getNombre(), a.getTelefono(), a.getFchIngreso()});
+        }
+        return modelo;
+    }
+    
+     public DefaultTableModel obtenerTablaActivistasPorFiltroModal(String filtro) {
+        String[] columnas = {"ID", "NOMBRE", "TELEFÓNO"};
+        DefaultTableModel modelo = new DefaultTableModel(null, columnas);
+        List<Activista> lista = activistaDAO.obtenerTodosPorFiltroModal(filtro);
+        for (Activista a : lista) {
+            modelo.addRow(new Object[]{a.getIdActivista(), a.getNombre(), a.getTelefono()});
+        }
+        return modelo;
+    }
+}

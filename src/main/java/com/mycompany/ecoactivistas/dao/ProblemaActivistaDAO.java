@@ -39,7 +39,7 @@ public class ProblemaActivistaDAO implements IProblemaActivistaDAO {
 
     @Override
     public List<ProblemaActivista> obtenerPorProblema(int idProblema) {
-        String sql = "SELECT * FROM Problema_Activista WHERE idProblema = ?";
+        String sql = "SELECT idProblema, idActivista FROM Problema_Activista WHERE idProblema = ? LIMIT 100";
         List<ProblemaActivista> lista = new ArrayList<>();
 
         try (Connection conn = ConexionDB.getConnection();
@@ -63,7 +63,7 @@ public class ProblemaActivistaDAO implements IProblemaActivistaDAO {
 
     @Override
     public List<ProblemaActivista> obtenerPorActivista(int idActivista) {
-        String sql = "SELECT * FROM Problema_Activista WHERE idActivista = ?";
+        String sql = "SELECT idProblema,idActivista  FROM Problema_Activista WHERE idActivista = ? LIMIT 100";
         List<ProblemaActivista> lista = new ArrayList<>();
 
         try (Connection conn = ConexionDB.getConnection();

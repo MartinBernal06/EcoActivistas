@@ -40,7 +40,7 @@ public class ActivistaDAO implements IActivistaDAO {
 
     @Override
     public Activista obtenerPorId(int idActivista) {
-        String sql = "SELECT * FROM Activista WHERE idActivista = ?";
+        String sql = "SELECT idActivista, nombre, telefono, fchIngreso FROM Activista WHERE idActivista = ? LIMIT 1";
         Activista activista = null;
 
         try (Connection conn = ConexionDB.getConnection();
@@ -65,7 +65,7 @@ public class ActivistaDAO implements IActivistaDAO {
 
     @Override
     public List<Activista> obtenerTodos() {
-        String sql = "SELECT * FROM Activista";
+        String sql = "SELECT idActivista, nombre, telefono, fchIngreso FROM Activista LIMIT 100";
         List<Activista> lista = new ArrayList<>();
 
         try (Connection conn = ConexionDB.getConnection();
@@ -119,5 +119,59 @@ public class ActivistaDAO implements IActivistaDAO {
             System.err.println("Error al eliminar activista: " + e.getMessage());
             return false;
         }
+    }
+
+    @Override
+    public List<Activista> obtenerTodosPorFiltro(String filtro) {
+        String sql = "SELECT idActivista, nombre, telefono, fchIngreso FROM Activista WHERE nombre LIKE ? LIMIT 100";
+        List<Activista> lista = new ArrayList<>();
+
+        try (Connection conn = ConexionDB.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+            ) {
+            
+            ps.setString(1, "%" + filtro + "%");
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Activista activista = new Activista();
+                activista.setIdActivista(rs.getInt("idActivista"));
+                activista.setNombre(rs.getString("nombre"));
+                activista.setTelefono(rs.getString("telefono"));
+                activista.setFchIngreso(rs.getDate("fchIngreso"));
+                lista.add(activista);
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Error al obtener todos los activistas: " + e.getMessage());
+        }
+        return lista; 
+    }
+    
+    @Override
+    public List<Activista> obtenerTodosPorFiltroModal(String filtro) {
+        String sql = "SELECT idActivista, nombre, telefono, fchIngreso FROM Activista WHERE nombre LIKE ? OR telefono LIKE ? LIMIT 100";
+        List<Activista> lista = new ArrayList<>();
+
+        try (Connection conn = ConexionDB.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+            ) {
+            
+            ps.setString(1, "%" + filtro + "%");
+            ps.setString(2, "%" + filtro + "%");
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Activista activista = new Activista();
+                activista.setIdActivista(rs.getInt("idActivista"));
+                activista.setNombre(rs.getString("nombre"));
+                activista.setTelefono(rs.getString("telefono"));
+                lista.add(activista);
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Error al obtener todos los activistas: " + e.getMessage());
+        }
+        return lista; 
     }
 }

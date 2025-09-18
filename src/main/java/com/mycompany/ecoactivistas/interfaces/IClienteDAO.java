@@ -16,6 +16,7 @@ public interface IClienteDAO {
     Cliente obtenerPorId(int idCliente);
     List<Cliente> obtenerTodos();
     List<Cliente> obtenerTodosPorFiltro(String filtro);
+    List<Cliente> obtenerTodosPorFiltroModal(String filtro);
     boolean actualizar(Cliente cliente);
     boolean eliminar(int idCliente);
 }

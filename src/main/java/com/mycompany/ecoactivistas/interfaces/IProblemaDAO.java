@@ -12,9 +12,10 @@ import java.util.List;
  * @author martinbl
  */
 public interface IProblemaDAO {
-    boolean insertar(Problema problema);
+    int insertar(Problema problema);
     Problema obtenerPorId(int idProblema);
     List<Problema> obtenerTodos();
+    List<Problema> obtenerTodosPorCliente(int idCliente);
     boolean actualizar(Problema problema);
     boolean eliminar(int idProblema);
 }

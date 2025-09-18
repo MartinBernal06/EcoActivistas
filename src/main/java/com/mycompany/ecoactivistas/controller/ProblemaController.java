@@ -10,6 +10,7 @@ import com.mycompany.ecoactivistas.model.Problema;
 import java.sql.Date;
 import java.util.Arrays;
 import java.util.List;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -24,18 +25,18 @@ public class ProblemaController {
     }
 
     // Insertar un nuevo problema con validaciones
-    public boolean agregarProblema(Date fchIni, Date fchFin, String estado, int idCliente) {
+    public int agregarProblema(Date fchIni, Date fchFin, String estado, int idCliente, String descripcion) {
         if (fchIni == null) {
             System.err.println("La fecha de inicio es obligatoria.");
-            return false;
+            return -1;
         }
         if (estado == null || !estadosValidos.contains(estado.toLowerCase())) {
             System.err.println("Estado inválido. Debe ser: pendiente, concluido o cancelado.");
-            return false;
+            return -1;
         }
         if (idCliente <= 0) {
             System.err.println("ID de cliente inválido.");
-            return false;
+            return -1;
         }
 
         Problema problema = new Problema();
@@ -43,6 +44,7 @@ public class ProblemaController {
         problema.setFchFin(fchFin);
         problema.setEstado(estado.toLowerCase());
         problema.setIdCliente(idCliente);
+        problema.setDescripcion(descripcion);
 
         return problemaDAO.insertar(problema);
     }
@@ -62,7 +64,7 @@ public class ProblemaController {
     }
 
     // Actualizar problema con validaciones
-    public boolean actualizarProblema(int idProblema, Date fchIni, Date fchFin, String estado, int idCliente) {
+    public boolean actualizarProblema(int idProblema, Date fchIni, Date fchFin, String estado, int idCliente, String descripcion) {
         if (idProblema <= 0) {
             System.err.println("ID de problema inválido.");
             return false;
@@ -86,6 +88,7 @@ public class ProblemaController {
         problema.setFchFin(fchFin);
         problema.setEstado(estado.toLowerCase());
         problema.setIdCliente(idCliente);
+        problema.setDescripcion(descripcion);
 
         return problemaDAO.actualizar(problema);
     }
@@ -97,5 +100,15 @@ public class ProblemaController {
             return false;
         }
         return problemaDAO.eliminar(idProblema);
+    }
+    
+    public DefaultTableModel obtenerTablaProblemas() {
+        String[] columnas = {"ID", "DESCRIPCIÓN", "ESTADO", "INICIO", "FIN"};
+        DefaultTableModel modelo = new DefaultTableModel(null, columnas);
+        List<Problema> lista = problemaDAO.obtenerTodos();
+        for (Problema c : lista) {
+            modelo.addRow(new Object[]{c.getIdProblema(), c.getDescripcion(), c.getEstado(), c.getFchIni(), c.getFchFin()});
+        }
+        return modelo;
     }
 }

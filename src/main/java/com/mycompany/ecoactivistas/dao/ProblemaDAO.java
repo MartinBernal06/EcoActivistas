@@ -11,6 +11,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,31 +20,41 @@ import java.util.List;
  * @author martinbl
  */
 public class ProblemaDAO implements IProblemaDAO {
+
     @Override
-    public boolean insertar(Problema problema) {
-        String sql = "INSERT INTO Problema (fch_ini, fch_fin, estado, idCliente) VALUES (?, ?, ?, ?)";
-        try (Connection conn = ConexionDB.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+    public int insertar(Problema problema) {
+        String sql = "INSERT INTO Problema (fch_ini, fch_fin, estado, descripcion, idCliente) VALUES (?, ?, ?, ?, ?)";
+        try (Connection conn = ConexionDB.getConnection(); PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             ps.setDate(1, problema.getFchIni());
             ps.setDate(2, problema.getFchFin());
             ps.setString(3, problema.getEstado());
-            ps.setInt(4, problema.getIdCliente());
+            ps.setString(4, problema.getDescripcion());
+            ps.setInt(5, problema.getIdCliente());
 
-            return ps.executeUpdate() > 0;
+            int filas = ps.executeUpdate();
+
+            if (filas > 0) {
+                try (ResultSet rs = ps.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        return rs.getInt(1); // devuelve el id generado
+                    }
+                }
+            }
+            return -1; // si no generó id
 
         } catch (SQLException e) {
             System.err.println("Error al insertar problema: " + e.getMessage());
-            return false;
+            return -1;
         }
     }
+
     @Override
     public Problema obtenerPorId(int idProblema) {
-        String sql = "SELECT * FROM Problema WHERE idProblema = ?";
+        String sql = "SELECT idProblema, fch_ini, fch_fin, estado, descripcion, idCliente FROM Problema WHERE idProblema = ? LIMIT 1";
         Problema problema = null;
 
-        try (Connection conn = ConexionDB.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = ConexionDB.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, idProblema);
             ResultSet rs = ps.executeQuery();
@@ -54,6 +65,7 @@ public class ProblemaDAO implements IProblemaDAO {
                 problema.setFchIni(rs.getDate("fch_ini"));
                 problema.setFchFin(rs.getDate("fch_fin"));
                 problema.setEstado(rs.getString("estado"));
+                problema.setDescripcion(rs.getString("descripcion"));
                 problema.setIdCliente(rs.getInt("idCliente"));
             }
 
@@ -65,12 +77,10 @@ public class ProblemaDAO implements IProblemaDAO {
 
     @Override
     public List<Problema> obtenerTodos() {
-        String sql = "SELECT * FROM Problema";
+        String sql = "SELECT idProblema, fch_ini, fch_fin, estado, descripcion, idCliente FROM Problema LIMIT 100";
         List<Problema> lista = new ArrayList<>();
 
-        try (Connection conn = ConexionDB.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+        try (Connection conn = ConexionDB.getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 Problema problema = new Problema();
@@ -78,6 +88,7 @@ public class ProblemaDAO implements IProblemaDAO {
                 problema.setFchIni(rs.getDate("fch_ini"));
                 problema.setFchFin(rs.getDate("fch_fin"));
                 problema.setEstado(rs.getString("estado"));
+                problema.setDescripcion(rs.getString("descripcion"));
                 problema.setIdCliente(rs.getInt("idCliente"));
                 lista.add(problema);
             }
@@ -90,15 +101,15 @@ public class ProblemaDAO implements IProblemaDAO {
 
     @Override
     public boolean actualizar(Problema problema) {
-        String sql = "UPDATE Problema SET fch_ini = ?, fch_fin = ?, estado = ?, idCliente = ? WHERE idProblema = ?";
-        try (Connection conn = ConexionDB.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        String sql = "UPDATE Problema SET fch_ini = ?, fch_fin = ?, estado = ?, idCliente = ?, descripcion = ? WHERE idProblema = ?";
+        try (Connection conn = ConexionDB.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setDate(1, problema.getFchIni());
             ps.setDate(2, problema.getFchFin());
             ps.setString(3, problema.getEstado());
             ps.setInt(4, problema.getIdCliente());
-            ps.setInt(5, problema.getIdProblema());
+            ps.setString(5, problema.getDescripcion());
+            ps.setInt(6, problema.getIdProblema());
 
             return ps.executeUpdate() > 0;
 
@@ -111,8 +122,7 @@ public class ProblemaDAO implements IProblemaDAO {
     @Override
     public boolean eliminar(int idProblema) {
         String sql = "DELETE FROM Problema WHERE idProblema = ?";
-        try (Connection conn = ConexionDB.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = ConexionDB.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, idProblema);
             return ps.executeUpdate() > 0;
@@ -121,5 +131,30 @@ public class ProblemaDAO implements IProblemaDAO {
             System.err.println("Error al eliminar problema: " + e.getMessage());
             return false;
         }
+    }
+
+    @Override
+    public List<Problema> obtenerTodosPorCliente(int idCliente) {
+        String sql = "SELECT idProblema, fch_ini, fch_fin, estado, descripcion, idCliente FROM Problema WHERE idCliente = ? LIMIT 100";
+        List<Problema> lista = new ArrayList<>();
+
+        try (Connection conn = ConexionDB.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, idCliente);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Problema problema = new Problema();
+                problema.setIdProblema(rs.getInt("idProblema"));
+                problema.setFchIni(rs.getDate("fch_ini"));
+                problema.setFchFin(rs.getDate("fch_fin"));
+                problema.setEstado(rs.getString("estado"));
+                problema.setEstado(rs.getString("descripcion"));
+                problema.setIdCliente(rs.getInt("idCliente"));
+                lista.add(problema);
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Error al obtener todos los problemas: " + e.getMessage());
+        }
+        return lista;
     }
 }

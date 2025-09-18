@@ -17,16 +17,18 @@ public class Problema {
     private Date fchFin;
     private String estado;   // pendiente, concluido, cancelado
     private int idCliente;   // FK hacia Cliente
+    private String descripcion; 
 
     public Problema() {
     }
 
-    public Problema(int idProblema, Date fchIni, Date fchFin, String estado, int idCliente) {
+    public Problema(int idProblema, Date fchIni, Date fchFin, String estado, int idCliente, String descripcion) {
         this.idProblema = idProblema;
         this.fchIni = fchIni;
         this.fchFin = fchFin;
         this.estado = estado;
         this.idCliente = idCliente;
+        this.descripcion = descripcion;
     }
 
     public int getIdProblema() {
@@ -67,6 +69,14 @@ public class Problema {
 
     public void setIdCliente(int idCliente) {
         this.idCliente = idCliente;
+    }
+
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
     }
 
     @Override
